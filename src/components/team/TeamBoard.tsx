@@ -1,6 +1,7 @@
 "use client";
 
 import { TEAM_COLUMNS } from "@/lib/teams";
+import { cn } from "@/lib/utils";
 import type { Player, TeamId } from "@/types/session";
 
 import { TeamColumn } from "./TeamColumn";
@@ -37,15 +38,26 @@ export function TeamBoard({ players, onAssignTeam, onRemove }: TeamBoardProps) {
         onRemove={onRemove}
       />
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+      <div
+        className={cn(
+          "flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pb-1",
+          "[scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+          "md:grid md:grid-cols-3 md:overflow-visible md:snap-none md:pb-0",
+        )}
+        aria-label="A/B/C 팀 배정"
+      >
         {teamConfigs.map((config) => (
-          <TeamColumn
+          <div
             key={config.id}
-            config={config}
-            players={filterPlayersByColumn(players, config.id)}
-            onAssignTeam={onAssignTeam}
-            onRemove={onRemove}
-          />
+            className="w-full min-w-full shrink-0 snap-center md:min-w-0 md:w-auto md:shrink"
+          >
+            <TeamColumn
+              config={config}
+              players={filterPlayersByColumn(players, config.id)}
+              onAssignTeam={onAssignTeam}
+              onRemove={onRemove}
+            />
+          </div>
         ))}
       </div>
     </section>
