@@ -79,7 +79,7 @@ export function FavoritePlayersSheet({
 
     onAddFavorite(trimmed);
     setName("");
-    onOpenChange(false);
+    inputRef.current?.focus();
   };
 
   const handleSubmit = () => {
@@ -138,10 +138,9 @@ export function FavoritePlayersSheet({
       return;
     }
 
-    const parts: string[] = [];
-    if (addedCount > 0) parts.push(`${addedCount}명 추가`);
-    if (skippedCount > 0) parts.push(`${skippedCount}명 중복 제외`);
-    setFeedback(parts.join(" · "));
+    resetSelection();
+    setFeedback(null);
+    onOpenChange(false);
   };
 
   return (

@@ -15,6 +15,7 @@ import {
   appleMuted,
   appleSectionLabel,
   appleSmallButton,
+  appleTouchIconButton,
 } from "@/lib/apple-ui";
 import {
   BULK_ASSIGN_TEAMS,
@@ -28,9 +29,7 @@ import type { Player, TeamColumnConfig, TeamId } from "@/types/session";
 type WaitingColumnProps = {
   config: TeamColumnConfig;
   players: Player[];
-  onAssignTeam: (id: string, teamId: TeamId | null) => void;
   onAssignTeamsBulk: (ids: string[], teamId: TeamId | null) => void;
-  onRemove: (id: string) => void;
   onRemoveBulk: (ids: string[]) => void;
 };
 
@@ -47,29 +46,17 @@ const waitingOverflowGridClassName = "grid w-full grid-cols-3 gap-2 sm:gap-2.5";
 export function WaitingColumn({
   config,
   players,
-  onAssignTeam,
   onAssignTeamsBulk,
-  onRemove,
   onRemoveBulk,
 }: WaitingColumnProps) {
-  const [isMultiSelectMode, setIsMultiSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   const mainPlayers = players.slice(0, WAITING_GRID_CAPACITY);
   const overflowPlayers = players.slice(WAITING_GRID_CAPACITY);
 
-  const exitMultiSelectMode = useCallback(() => {
-    setIsMultiSelectMode(false);
+  const clearSelection = useCallback(() => {
     setSelectedIds(new Set());
   }, []);
-
-  const toggleMultiSelectMode = () => {
-    if (isMultiSelectMode) {
-      exitMultiSelectMode();
-      return;
-    }
-    setIsMultiSelectMode(true);
-  };
 
   const toggleSelection = (id: string) => {
     setSelectedIds((prev) => {
@@ -103,11 +90,9 @@ export function WaitingColumn({
         key={player.id}
         player={player}
         compact
-        selectionMode={isMultiSelectMode}
+        selectionMode
         selected={selectedIds.has(player.id)}
         onToggleSelect={toggleSelection}
-        onAssignTeam={onAssignTeam}
-        onRemove={onRemove}
       />
     ));
 
@@ -126,37 +111,53 @@ export function WaitingColumn({
               {config.label}
             </CardTitle>
 
-            <div className="flex shrink-0 items-center gap-2">
-              {isMultiSelectMode && (
+            <div className="flex shrink-0 flex-wrap items-center justify-end gap-1.5">
+              {BULK_ASSIGN_TEAMS.map((team) => (
                 <Button
+                  key={team.id}
                   type="button"
                   size="sm"
                   variant="ghost"
                   disabled={selectedIds.size === 0}
-                  onClick={handleBulkDelete}
-                  aria-label="선택 삭제"
+                  onClick={() => handleBulkAssign(team.id)}
+                  aria-label={`${team.label} 배정`}
                   className={cn(
-                    appleSmallButton,
-                    "bg-red-500/10 text-red-300/90 disabled:opacity-40",
+                    appleTouchIconButton,
+                    "text-sm font-semibold disabled:opacity-40",
+                    team.buttonClass,
                   )}
                 >
-                  <Trash2 className="size-4" />
+                  {team.id}
                 </Button>
-              )}
+              ))}
 
               <Button
                 type="button"
                 size="sm"
                 variant="ghost"
-                onClick={toggleMultiSelectMode}
+                disabled={selectedIds.size === 0}
+                onClick={handleBulkDelete}
+                aria-label="선택 삭제"
                 className={cn(
-                  appleSmallButton,
-                  isMultiSelectMode
-                    ? "bg-white/12 text-neutral-100"
-                    : "bg-white/8 text-neutral-300",
+                  appleTouchIconButton,
+                  "bg-red-500/10 text-red-300/90 disabled:opacity-40",
                 )}
               >
-                {isMultiSelectMode ? "취소" : "다중선택"}
+                <Trash2 className="size-4" />
+              </Button>
+
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                disabled={selectedIds.size === 0}
+                onClick={clearSelection}
+                className={cn(
+                  appleSmallButton,
+                  "bg-white/8 text-neutral-300 disabled:opacity-40",
+                )}
+              >
+                취소
               </Button>
 
               <Badge
@@ -170,44 +171,24 @@ export function WaitingColumn({
             </div>
           </div>
 
-          {isMultiSelectMode && (
-            <div className="flex flex-col gap-2">
-              <div className="flex flex-wrap gap-2">
-                {BULK_ASSIGN_TEAMS.map((team) => (
-                  <Button
-                    key={team.id}
-                    type="button"
-                    size="sm"
-                    variant="ghost"
-                    disabled={selectedIds.size === 0}
-                    onClick={() => handleBulkAssign(team.id)}
-                    className={cn(appleSmallButton, team.buttonClass)}
-                  >
-                    {team.label}
-                  </Button>
-                ))}
-              </div>
-
-              {selectedIds.size > 0 && (
-                <p className={`${appleMuted} text-xs`}>
-                  {selectedIds.size}명 선택됨 · 팀 배정 또는 삭제
-                </p>
-              )}
-            </div>
+          {selectedIds.size > 0 && (
+            <p className={`${appleMuted} text-xs`}>
+              {selectedIds.size}명 선택됨 · 팀 아이콘 또는 삭제
+            </p>
           )}
         </div>
       </CardHeader>
 
       <CardContent
-        className={cn(appleCardContent, isMultiSelectMode && "cursor-default")}
-        onClick={isMultiSelectMode ? exitMultiSelectMode : undefined}
+        className={cn(appleCardContent, "cursor-default")}
+        onClick={clearSelection}
       >
         {players.length === 0 ? (
           <p className={`${appleMuted} py-12 text-center`}>
             아직 배정된 선수가 없습니다
           </p>
         ) : (
-          <div>
+          <div onClick={(event) => event.stopPropagation()}>
             <div
               className={waitingMainGridClassName}
               style={waitingMainGridStyle}

@@ -45,9 +45,7 @@ export function TeamBoard({
       <WaitingColumn
         config={waitingConfig}
         players={waitingPlayers}
-        onAssignTeam={onAssignTeam}
         onAssignTeamsBulk={onAssignTeamsBulk}
-        onRemove={onRemove}
         onRemoveBulk={onRemoveBulk}
       />
 

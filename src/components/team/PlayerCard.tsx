@@ -30,8 +30,8 @@ type PlayerCardProps = {
   selectionMode?: boolean;
   selected?: boolean;
   onToggleSelect?: (id: string) => void;
-  onAssignTeam: (id: string, teamId: TeamId | null) => void;
-  onRemove: (id: string) => void;
+  onAssignTeam?: (id: string, teamId: TeamId | null) => void;
+  onRemove?: (id: string) => void;
 };
 
 export function PlayerCard({
@@ -47,7 +47,7 @@ export function PlayerCard({
 
   const handleAssign = (optionId: TeamId | "waiting") => {
     const teamId = optionId === "waiting" ? null : optionId;
-    onAssignTeam(player.id, teamId);
+    onAssignTeam?.(player.id, teamId);
   };
 
   const handleToggleSelect = () => {
@@ -169,7 +169,7 @@ export function PlayerCard({
           compact && "h-8 min-h-8 w-8 min-w-8",
         )}
         aria-label={`${player.name} 삭제`}
-        onClick={() => onRemove(player.id)}
+        onClick={() => onRemove?.(player.id)}
       >
         <X className={compact ? "size-3.5" : "size-4"} />
       </Button>
