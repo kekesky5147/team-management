@@ -13,6 +13,7 @@ export function TeamManagementApp() {
     addPlayer,
     removePlayer,
     assignTeam,
+    assignTeamsBulk,
     resetSession,
     checkDuplicateName,
   } = useSessionStorage();
@@ -38,6 +39,7 @@ export function TeamManagementApp() {
       <TeamBoard
         players={players}
         onAssignTeam={assignTeam}
+        onAssignTeamsBulk={assignTeamsBulk}
         onRemove={removePlayer}
       />
     </div>

@@ -5,10 +5,12 @@ import { cn } from "@/lib/utils";
 import type { Player, TeamId } from "@/types/session";
 
 import { TeamColumn } from "./TeamColumn";
+import { WaitingColumn } from "./WaitingColumn";
 
 type TeamBoardProps = {
   players: Player[];
   onAssignTeam: (id: string, teamId: TeamId | null) => void;
+  onAssignTeamsBulk: (ids: string[], teamId: TeamId | null) => void;
   onRemove: (id: string) => void;
 };
 
@@ -23,18 +25,23 @@ function filterPlayersByColumn(
   return players.filter((player) => player.teamId === columnId);
 }
 
-export function TeamBoard({ players, onAssignTeam, onRemove }: TeamBoardProps) {
+export function TeamBoard({
+  players,
+  onAssignTeam,
+  onAssignTeamsBulk,
+  onRemove,
+}: TeamBoardProps) {
   const waitingConfig = TEAM_COLUMNS.find((column) => column.id === "waiting")!;
   const teamConfigs = TEAM_COLUMNS.filter((column) => column.id !== "waiting");
   const waitingPlayers = filterPlayersByColumn(players, "waiting");
 
   return (
     <section className="flex flex-col gap-4">
-      <TeamColumn
+      <WaitingColumn
         config={waitingConfig}
         players={waitingPlayers}
-        variant="waiting"
         onAssignTeam={onAssignTeam}
+        onAssignTeamsBulk={onAssignTeamsBulk}
         onRemove={onRemove}
       />
 

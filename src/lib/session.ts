@@ -97,6 +97,24 @@ export function assignPlayerTeam(
   };
 }
 
+export function assignPlayersTeam(
+  session: SessionState,
+  ids: string[],
+  teamId: TeamId | null,
+): SessionState {
+  if (ids.length === 0) return session;
+
+  const idSet = new Set(ids);
+
+  return {
+    ...session,
+    players: session.players.map((player) =>
+      idSet.has(player.id) ? { ...player, teamId } : player,
+    ),
+    updatedAt: new Date().toISOString(),
+  };
+}
+
 export function resetSessionState(): SessionState {
   return createEmptySession();
 }

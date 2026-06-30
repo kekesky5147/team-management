@@ -13,6 +13,31 @@ export const WAITING_GRID_MAX_HEIGHT = `calc(${WAITING_GRID.rows} * ${WAITING_GR
 export const WAITING_GRID_CAPACITY =
   WAITING_GRID.rows * WAITING_GRID.columns;
 
+export const BULK_ASSIGN_TEAMS: {
+  id: TeamId;
+  label: string;
+  buttonClass: string;
+}[] = [
+  {
+    id: "A",
+    label: "A팀",
+    buttonClass:
+      "border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 dark:border-blue-900 dark:bg-blue-950/50 dark:text-blue-300 dark:hover:bg-blue-900/50",
+  },
+  {
+    id: "B",
+    label: "B팀",
+    buttonClass:
+      "border-orange-200 bg-orange-50 text-orange-700 hover:bg-orange-100 dark:border-orange-900 dark:bg-orange-950/50 dark:text-orange-300 dark:hover:bg-orange-900/50",
+  },
+  {
+    id: "C",
+    label: "C팀",
+    buttonClass:
+      "border-green-200 bg-green-50 text-green-700 hover:bg-green-100 dark:border-green-900 dark:bg-green-950/50 dark:text-green-300 dark:hover:bg-green-900/50",
+  },
+];
+
 export const TEAM_COLUMNS: TeamColumnConfig[] = [
   {
     id: "waiting",

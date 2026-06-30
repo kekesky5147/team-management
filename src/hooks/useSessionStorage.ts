@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import {
   addPlayerToSession,
   assignPlayerTeam,
+  assignPlayersTeam,
   createEmptySession,
   hasDuplicateName,
   loadSessionFromStorage,
@@ -43,6 +44,10 @@ export function useSessionStorage() {
     setSession((prev) => assignPlayerTeam(prev, id, teamId));
   }, []);
 
+  const assignTeamsBulk = useCallback((ids: string[], teamId: TeamId | null) => {
+    setSession((prev) => assignPlayersTeam(prev, ids, teamId));
+  }, []);
+
   const resetSession = useCallback(() => {
     setSession(resetSessionState());
   }, []);
@@ -59,6 +64,7 @@ export function useSessionStorage() {
     addPlayer,
     removePlayer,
     assignTeam,
+    assignTeamsBulk,
     resetSession,
     checkDuplicateName,
   };
