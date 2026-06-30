@@ -18,12 +18,14 @@ import type { Player, TeamId } from "@/types/session";
 
 type PlayerCardProps = {
   player: Player;
+  compact?: boolean;
   onAssignTeam: (id: string, teamId: TeamId | null) => void;
   onRemove: (id: string) => void;
 };
 
 export function PlayerCard({
   player,
+  compact = false,
   onAssignTeam,
   onRemove,
 }: PlayerCardProps) {
@@ -35,37 +37,58 @@ export function PlayerCard({
   };
 
   return (
-    <div className="flex items-center gap-2 rounded-lg border bg-background px-2 py-1.5 shadow-sm">
-      <DropdownMenu>
-        <DropdownMenuTrigger
-          render={
-            <Button
-              variant="ghost"
-              className="min-h-10 flex-1 justify-between px-3 text-base font-medium"
+    <div
+      className={cn(
+        "flex items-center gap-1 rounded-lg border bg-background shadow-sm",
+        compact
+          ? "h-11 min-h-11 max-h-11 w-full min-w-0 px-1 py-1"
+          : "gap-2 px-2 py-1.5",
+      )}
+    >
+      <div className="min-w-0 flex-1">
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            render={
+              <Button
+                variant="ghost"
+                className={cn(
+                  "min-h-10 w-full touch-manipulation font-medium",
+                  compact
+                    ? "h-full min-h-0 justify-center px-1 text-xs active:bg-muted max-md:rounded-md md:justify-between sm:px-2 sm:text-sm"
+                    : "justify-center px-3 text-base active:bg-muted max-md:rounded-md md:justify-between",
+                )}
+              />
+            }
+          >
+            <span className="truncate">{player.name}</span>
+            <ChevronDown
+              className={cn(
+                "hidden shrink-0 text-muted-foreground md:block",
+                compact ? "size-3.5" : "size-4",
+              )}
             />
-          }
-        >
-          <span className="truncate">{player.name}</span>
-          <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="w-40">
-          {TEAM_ASSIGN_OPTIONS.map((option) => {
-            const isCurrent = option.id === currentOptionId;
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-40">
+            {TEAM_ASSIGN_OPTIONS.map((option) => {
+              const isCurrent = option.id === currentOptionId;
 
-            return (
-              <DropdownMenuItem
-                key={option.id}
-                disabled={isCurrent}
-                onClick={() => handleAssign(option.id)}
-                className="min-h-10 text-base"
-              >
-                <span className="flex-1">{option.label}</span>
-                {isCurrent && <Check className="size-4 text-muted-foreground" />}
-              </DropdownMenuItem>
-            );
-          })}
-        </DropdownMenuContent>
-      </DropdownMenu>
+              return (
+                <DropdownMenuItem
+                  key={option.id}
+                  disabled={isCurrent}
+                  onClick={() => handleAssign(option.id)}
+                  className="min-h-10 text-base"
+                >
+                  <span className="flex-1">{option.label}</span>
+                  {isCurrent && (
+                    <Check className="size-4 text-muted-foreground" />
+                  )}
+                </DropdownMenuItem>
+              );
+            })}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
 
       <Button
         type="button"
@@ -73,7 +96,7 @@ export function PlayerCard({
         size="icon-sm"
         className={cn(
           "shrink-0 text-muted-foreground hover:text-destructive",
-          "min-h-10 min-w-10",
+          compact ? "h-8 min-h-8 min-w-8 w-8" : "min-h-10 min-w-10",
         )}
         aria-label={`${player.name} 삭제`}
         onClick={() => onRemove(player.id)}

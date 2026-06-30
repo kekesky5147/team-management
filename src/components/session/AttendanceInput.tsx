@@ -29,6 +29,7 @@ export function AttendanceInput({
   const [pendingName, setPendingName] = useState("");
   const [duplicateOpen, setDuplicateOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const isComposingRef = useRef(false);
 
   const submitName = (value: string) => {
     const trimmed = value.trim();
@@ -46,13 +47,32 @@ export function AttendanceInput({
   };
 
   const handleSubmit = () => {
-    submitName(name);
+    submitName(inputRef.current?.value ?? name);
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      submitName(name);
+    if (event.key !== "Enter") return;
+    if (isComposingRef.current || event.nativeEvent.isComposing) return;
+
+    event.preventDefault();
+    submitName(event.currentTarget.value);
+  };
+
+  const handleCompositionStart = () => {
+    isComposingRef.current = true;
+  };
+
+  const handleCompositionEnd = (
+    event: React.CompositionEvent<HTMLInputElement>,
+  ) => {
+    isComposingRef.current = false;
+    setName(event.currentTarget.value);
+  };
+
+  const handleDuplicateOpenChange = (open: boolean) => {
+    setDuplicateOpen(open);
+    if (!open) {
+      setPendingName("");
     }
   };
 
@@ -71,6 +91,8 @@ export function AttendanceInput({
           ref={inputRef}
           value={name}
           onChange={(event) => setName(event.target.value)}
+          onCompositionStart={handleCompositionStart}
+          onCompositionEnd={handleCompositionEnd}
           onKeyDown={handleKeyDown}
           placeholder="선수 이름을 입력하세요"
           className="min-h-11 flex-1 text-base"
@@ -86,7 +108,7 @@ export function AttendanceInput({
         </Button>
       </section>
 
-      <AlertDialog open={duplicateOpen} onOpenChange={setDuplicateOpen}>
+      <AlertDialog open={duplicateOpen} onOpenChange={handleDuplicateOpenChange}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>중복된 이름</AlertDialogTitle>
@@ -96,9 +118,7 @@ export function AttendanceInput({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setPendingName("")}>
-              취소
-            </AlertDialogCancel>
+            <AlertDialogCancel>취소</AlertDialogCancel>
             <AlertDialogAction onClick={handleDuplicateConfirm}>
               추가
             </AlertDialogAction>

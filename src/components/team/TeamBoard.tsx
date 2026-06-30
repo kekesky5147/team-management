@@ -23,17 +23,31 @@ function filterPlayersByColumn(
 }
 
 export function TeamBoard({ players, onAssignTeam, onRemove }: TeamBoardProps) {
+  const waitingConfig = TEAM_COLUMNS.find((column) => column.id === "waiting")!;
+  const teamConfigs = TEAM_COLUMNS.filter((column) => column.id !== "waiting");
+  const waitingPlayers = filterPlayersByColumn(players, "waiting");
+
   return (
-    <section className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-      {TEAM_COLUMNS.map((config) => (
-        <TeamColumn
-          key={config.id}
-          config={config}
-          players={filterPlayersByColumn(players, config.id)}
-          onAssignTeam={onAssignTeam}
-          onRemove={onRemove}
-        />
-      ))}
+    <section className="flex flex-col gap-4">
+      <TeamColumn
+        config={waitingConfig}
+        players={waitingPlayers}
+        variant="waiting"
+        onAssignTeam={onAssignTeam}
+        onRemove={onRemove}
+      />
+
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        {teamConfigs.map((config) => (
+          <TeamColumn
+            key={config.id}
+            config={config}
+            players={filterPlayersByColumn(players, config.id)}
+            onAssignTeam={onAssignTeam}
+            onRemove={onRemove}
+          />
+        ))}
+      </div>
     </section>
   );
 }
