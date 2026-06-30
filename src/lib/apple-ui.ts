@@ -43,7 +43,13 @@ export const appleSmallButton =
   "h-11 min-h-11 rounded-xl border-0 px-3.5 text-xs font-medium shadow-none transition-all duration-200 ease-out active:scale-95 hover-hover:-translate-y-0.5 hover-hover:shadow-md hover-hover:shadow-black/20";
 
 export const applePlayerSurface =
-  "flex items-center gap-1 rounded-xl border-0 bg-surface-3 px-1.5 py-1 shadow-none transition-all duration-200 ease-out active:scale-[0.98] md:px-2 md:py-1.5 hover-hover:-translate-y-0.5 hover-hover:bg-neutral-800/60 hover-hover:shadow-lg hover-hover:shadow-black/25";
+  "rounded-xl border-0 bg-surface-3 shadow-none transition-all duration-200 ease-out active:scale-[0.98] md:hover:-translate-y-0.5 md:hover:bg-neutral-800/60 md:hover:shadow-lg md:hover:shadow-black/25";
+
+export const appleTeamPlayerCard =
+  "relative w-full min-w-0 overflow-hidden rounded-xl border-0 bg-surface-3 shadow-none";
+
+export const appleTeamPlayerName =
+  "block w-full max-w-full truncate text-center font-medium text-neutral-200";
 
 export const appleDivider = "my-5 h-px bg-white/5 sm:my-6";
 

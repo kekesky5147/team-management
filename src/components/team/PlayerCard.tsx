@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, ChevronDown, X } from "lucide-react";
+import { Check, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -11,10 +11,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   appleDropdownContent,
-  applePlayerSurface,
   appleSelectableCard,
   appleSelectableCardSelected,
   appleSelectableCardUnselected,
+  appleTeamPlayerCard,
+  appleTeamPlayerName,
   appleTouchIconButton,
 } from "@/lib/apple-ui";
 import {
@@ -33,6 +34,8 @@ type PlayerCardProps = {
   onAssignTeam?: (id: string, teamId: TeamId | null) => void;
   onRemove?: (id: string) => void;
 };
+
+const TEAM_ACTION_INSET = "px-8";
 
 export function PlayerCard({
   player,
@@ -87,7 +90,7 @@ export function PlayerCard({
       >
         <span
           className={cn(
-            "w-full min-w-0 truncate text-center font-medium text-neutral-200",
+            appleTeamPlayerName,
             compact ? "text-xs sm:text-sm" : "text-base",
             selected && "text-blue-100",
           )}
@@ -98,78 +101,62 @@ export function PlayerCard({
     );
   }
 
-  return (
-    <div
-      className={cn(
-        applePlayerSurface,
-        "relative grid w-full place-items-center",
-        compact
-          ? "h-10 min-h-10 max-h-10 min-w-0 px-8"
-          : "min-h-11 px-11 py-1 sm:py-2",
-      )}
-    >
-      <div className="w-full min-w-0">
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            render={
-              <Button
-                variant="ghost"
-                className={cn(
-                  "relative w-full min-w-0 touch-manipulation justify-center font-medium text-neutral-200 transition-all duration-200 active:scale-95 hover:bg-white/5",
-                  compact
-                    ? "h-10 min-h-10 rounded-lg px-0 text-xs"
-                    : "min-h-11 rounded-lg px-0 text-base",
-                )}
-              />
-            }
-          >
-            <span
-              className={cn(
-                "block w-full truncate text-center font-medium text-neutral-200",
-                compact ? "text-xs" : "text-base",
-              )}
-            >
-              {player.name}
-            </span>
-            {!compact && (
-              <ChevronDown className="absolute top-1/2 right-0 size-4 -translate-y-1/2 shrink-0 text-neutral-500" />
-            )}
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            align="center"
-            className={`${appleDropdownContent} w-40`}
-          >
-            {TEAM_ASSIGN_OPTIONS.map((option) => {
-              const isCurrent = option.id === currentOptionId;
+  const cardHeight = compact ? "h-10 min-h-10 max-h-10" : "h-11 min-h-11";
+  const nameSize = compact ? "text-xs" : "text-sm sm:text-base";
+  const deleteSize = compact ? "h-8 min-h-8 w-8 min-w-8" : "h-11 min-h-11 w-11 min-w-11";
 
-              return (
-                <DropdownMenuItem
-                  key={option.id}
-                  disabled={isCurrent}
-                  onClick={() => handleAssign(option.id)}
-                  className="min-h-11 justify-center rounded-lg text-center text-base text-neutral-200 focus:bg-white/10"
-                >
-                  <span>{option.label}</span>
-                  {isCurrent && (
-                    <Check className="size-4 text-neutral-400" />
-                  )}
-                </DropdownMenuItem>
-              );
-            })}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+  return (
+    <div className={cn(appleTeamPlayerCard, cardHeight)}>
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          render={
+            <Button
+              variant="ghost"
+              className={cn(
+                "absolute inset-0 z-0 flex h-full w-full touch-manipulation items-center justify-center rounded-xl font-medium text-neutral-200 transition-all duration-200 hover:bg-white/5 active:scale-[0.98]",
+                TEAM_ACTION_INSET,
+                cardHeight,
+              )}
+            />
+          }
+        >
+          <span className={cn(appleTeamPlayerName, nameSize)}>{player.name}</span>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          align="center"
+          className={`${appleDropdownContent} w-40`}
+        >
+          {TEAM_ASSIGN_OPTIONS.map((option) => {
+            const isCurrent = option.id === currentOptionId;
+
+            return (
+              <DropdownMenuItem
+                key={option.id}
+                disabled={isCurrent}
+                onClick={() => handleAssign(option.id)}
+                className="min-h-11 justify-center rounded-lg text-center text-base text-neutral-200 focus:bg-white/10"
+              >
+                <span>{option.label}</span>
+                {isCurrent && <Check className="size-4 text-neutral-400" />}
+              </DropdownMenuItem>
+            );
+          })}
+        </DropdownMenuContent>
+      </DropdownMenu>
 
       <Button
         type="button"
         variant="ghost"
         className={cn(
           appleTouchIconButton,
-          "absolute top-1/2 right-0 -translate-y-1/2",
-          compact && "h-8 min-h-8 w-8 min-w-8",
+          "absolute top-1/2 right-0 z-10 -translate-y-1/2",
+          deleteSize,
         )}
         aria-label={`${player.name} 삭제`}
-        onClick={() => onRemove?.(player.id)}
+        onClick={(event) => {
+          event.stopPropagation();
+          onRemove?.(player.id);
+        }}
       >
         <X className={compact ? "size-3.5" : "size-4"} />
       </Button>
