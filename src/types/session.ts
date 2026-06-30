@@ -7,7 +7,6 @@ export type Player = {
 };
 
 export type SessionState = {
-  sessionDate: string;
   players: Player[];
   updatedAt: string;
 };

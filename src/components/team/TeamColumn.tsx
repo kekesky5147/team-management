@@ -1,5 +1,11 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  appleCard,
+  appleCardContent,
+  appleCardHeader,
+  appleMuted,
+} from "@/lib/apple-ui";
 import { cn } from "@/lib/utils";
 import type { Player, TeamColumnConfig, TeamId } from "@/types/session";
 
@@ -19,37 +25,41 @@ export function TeamColumn({
   onRemove,
 }: TeamColumnProps) {
   return (
-    <Card className="h-full gap-0 py-0 shadow-sm">
-      <CardHeader
-        className={cn(
-          "rounded-t-xl border-b px-4 py-4",
-          config.headerClass,
-        )}
-      >
-        <div className="flex items-center justify-between gap-2">
-          <CardTitle className="text-base font-semibold">
+    <Card className={cn(appleCard, "@container/team-col h-full transition-all duration-300 hover-hover:shadow-lg hover-hover:shadow-black/20")}>
+      <CardHeader className={cn(appleCardHeader, "rounded-t-2xl", config.headerClass)}>
+        <div className="flex items-center justify-between gap-3">
+          <CardTitle className="text-base font-semibold tracking-tight text-inherit">
             {config.label}
           </CardTitle>
-          <Badge className={cn("px-2.5 py-1 text-sm", config.badgeClass)}>
+          <Badge
+            className={cn(
+              "rounded-full border-0 px-3 py-1 text-sm font-medium shadow-none",
+              config.badgeClass,
+            )}
+          >
             {players.length}명
           </Badge>
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-2 px-4 py-4">
+      <CardContent className={appleCardContent}>
         {players.length === 0 ? (
-          <p className="py-8 text-center text-sm text-muted-foreground">
+          <p className={`${appleMuted} py-12 text-center`}>
             아직 배정된 선수가 없습니다
           </p>
         ) : (
-          players.map((player) => (
-            <PlayerCard
-              key={player.id}
-              player={player}
-              onAssignTeam={onAssignTeam}
-              onRemove={onRemove}
-            />
-          ))
+          <ul className="grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-1 lg:gap-3">
+            {players.map((player) => (
+              <li key={player.id} className="min-w-0">
+                <PlayerCard
+                  player={player}
+                  compact
+                  onAssignTeam={onAssignTeam}
+                  onRemove={onRemove}
+                />
+              </li>
+            ))}
+          </ul>
         )}
       </CardContent>
     </Card>

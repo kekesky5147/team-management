@@ -1,9 +1,9 @@
 "use client";
 
 import { TEAM_COLUMNS } from "@/lib/teams";
-import { cn } from "@/lib/utils";
 import type { Player, TeamId } from "@/types/session";
 
+import { TeamCarousel } from "./TeamCarousel";
 import { TeamColumn } from "./TeamColumn";
 import { WaitingColumn } from "./WaitingColumn";
 
@@ -12,6 +12,7 @@ type TeamBoardProps = {
   onAssignTeam: (id: string, teamId: TeamId | null) => void;
   onAssignTeamsBulk: (ids: string[], teamId: TeamId | null) => void;
   onRemove: (id: string) => void;
+  onRemoveBulk: (ids: string[]) => void;
 };
 
 function filterPlayersByColumn(
@@ -30,41 +31,45 @@ export function TeamBoard({
   onAssignTeam,
   onAssignTeamsBulk,
   onRemove,
+  onRemoveBulk,
 }: TeamBoardProps) {
   const waitingConfig = TEAM_COLUMNS.find((column) => column.id === "waiting")!;
   const teamConfigs = TEAM_COLUMNS.filter((column) => column.id !== "waiting");
   const waitingPlayers = filterPlayersByColumn(players, "waiting");
 
+  const getTeamPlayers = (teamId: (typeof TEAM_COLUMNS)[number]["id"]) =>
+    filterPlayersByColumn(players, teamId);
+
   return (
-    <section className="flex flex-col gap-4">
+    <section className="flex flex-col gap-6 sm:gap-8">
       <WaitingColumn
         config={waitingConfig}
         players={waitingPlayers}
         onAssignTeam={onAssignTeam}
         onAssignTeamsBulk={onAssignTeamsBulk}
         onRemove={onRemove}
+        onRemoveBulk={onRemoveBulk}
+      />
+
+      <TeamCarousel
+        teamConfigs={teamConfigs}
+        getPlayers={getTeamPlayers}
+        onAssignTeam={onAssignTeam}
+        onRemove={onRemove}
       />
 
       <div
-        className={cn(
-          "flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pb-1",
-          "[scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
-          "md:grid md:grid-cols-3 md:overflow-visible md:snap-none md:pb-0",
-        )}
+        className="hidden grid-cols-3 gap-4 lg:grid"
         aria-label="A/B/C 팀 배정"
       >
         {teamConfigs.map((config) => (
-          <div
+          <TeamColumn
             key={config.id}
-            className="w-full min-w-full shrink-0 snap-center md:min-w-0 md:w-auto md:shrink"
-          >
-            <TeamColumn
-              config={config}
-              players={filterPlayersByColumn(players, config.id)}
-              onAssignTeam={onAssignTeam}
-              onRemove={onRemove}
-            />
-          </div>
+            config={config}
+            players={filterPlayersByColumn(players, config.id)}
+            onAssignTeam={onAssignTeam}
+            onRemove={onRemove}
+          />
         ))}
       </div>
     </section>

@@ -22,19 +22,19 @@ export const BULK_ASSIGN_TEAMS: {
     id: "A",
     label: "A팀",
     buttonClass:
-      "border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 dark:border-blue-900 dark:bg-blue-950/50 dark:text-blue-300 dark:hover:bg-blue-900/50",
+      "bg-blue-500/10 text-blue-200/90 hover:bg-blue-500/15 hover:shadow-blue-500/10",
   },
   {
     id: "B",
     label: "B팀",
     buttonClass:
-      "border-orange-200 bg-orange-50 text-orange-700 hover:bg-orange-100 dark:border-orange-900 dark:bg-orange-950/50 dark:text-orange-300 dark:hover:bg-orange-900/50",
+      "bg-orange-500/10 text-orange-200/90 hover:bg-orange-500/15 hover:shadow-orange-500/10",
   },
   {
     id: "C",
     label: "C팀",
     buttonClass:
-      "border-green-200 bg-green-50 text-green-700 hover:bg-green-100 dark:border-green-900 dark:bg-green-950/50 dark:text-green-300 dark:hover:bg-green-900/50",
+      "bg-emerald-500/10 text-emerald-200/90 hover:bg-emerald-500/15 hover:shadow-emerald-500/10",
   },
 ];
 
@@ -42,34 +42,26 @@ export const TEAM_COLUMNS: TeamColumnConfig[] = [
   {
     id: "waiting",
     label: "출석 대기",
-    headerClass:
-      "bg-zinc-100 text-zinc-700 border-zinc-200 dark:bg-zinc-800/60 dark:text-zinc-200 dark:border-zinc-700",
-    badgeClass:
-      "bg-zinc-200 text-zinc-700 dark:bg-zinc-700 dark:text-zinc-100",
+    headerClass: "bg-white/[0.03] text-neutral-200",
+    badgeClass: "bg-white/10 text-neutral-300",
   },
   {
     id: "A",
     label: "A팀",
-    headerClass:
-      "bg-blue-50 text-blue-700 border-blue-100 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-900",
-    badgeClass:
-      "bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-200",
+    headerClass: "bg-blue-500/[0.06] text-blue-200/90",
+    badgeClass: "bg-blue-400/10 text-blue-200/80",
   },
   {
     id: "B",
     label: "B팀",
-    headerClass:
-      "bg-orange-50 text-orange-700 border-orange-100 dark:bg-orange-950/50 dark:text-orange-300 dark:border-orange-900",
-    badgeClass:
-      "bg-orange-100 text-orange-700 dark:bg-orange-900/60 dark:text-orange-200",
+    headerClass: "bg-orange-500/[0.06] text-orange-200/90",
+    badgeClass: "bg-orange-400/10 text-orange-200/80",
   },
   {
     id: "C",
     label: "C팀",
-    headerClass:
-      "bg-green-50 text-green-700 border-green-100 dark:bg-green-950/50 dark:text-green-300 dark:border-green-900",
-    badgeClass:
-      "bg-green-100 text-green-700 dark:bg-green-900/60 dark:text-green-200",
+    headerClass: "bg-emerald-500/[0.06] text-emerald-200/90",
+    badgeClass: "bg-emerald-400/10 text-emerald-200/80",
   },
 ];
 

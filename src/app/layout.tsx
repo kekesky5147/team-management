@@ -1,20 +1,24 @@
+import type { Viewport } from "next";
+
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-sans",
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "축구팀 매니지먼트",
+  title: "LV Tigers",
   description: "출석 관리 및 A/B/C 팀 배정 도구",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
@@ -23,11 +27,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="ko"
-      className={`${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}
-    >
-      <body className="flex min-h-full flex-col">{children}</body>
+    <html lang="ko" className={`${inter.variable} dark h-full antialiased`}>
+      <body className="flex min-h-full flex-col font-sans pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
+        {children}
+      </body>
     </html>
   );
 }

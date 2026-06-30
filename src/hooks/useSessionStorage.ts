@@ -4,12 +4,14 @@ import { useCallback, useEffect, useState } from "react";
 
 import {
   addPlayerToSession,
+  addPlayersBulkToSession,
   assignPlayerTeam,
   assignPlayersTeam,
   createEmptySession,
   hasDuplicateName,
   loadSessionFromStorage,
   removePlayerFromSession,
+  removePlayersBulkFromSession,
   resetSessionState,
   saveSessionToStorage,
 } from "@/lib/session";
@@ -36,8 +38,26 @@ export function useSessionStorage() {
     setSession((prev) => addPlayerToSession(prev, name));
   }, []);
 
+  const addPlayersBulk = useCallback((names: string[]) => {
+    let addedCount = 0;
+    let skippedCount = 0;
+
+    setSession((prev) => {
+      const bulkResult = addPlayersBulkToSession(prev, names);
+      addedCount = bulkResult.addedCount;
+      skippedCount = bulkResult.skippedCount;
+      return bulkResult.session;
+    });
+
+    return { addedCount, skippedCount };
+  }, []);
+
   const removePlayer = useCallback((id: string) => {
     setSession((prev) => removePlayerFromSession(prev, id));
+  }, []);
+
+  const removePlayersBulk = useCallback((ids: string[]) => {
+    setSession((prev) => removePlayersBulkFromSession(prev, ids));
   }, []);
 
   const assignTeam = useCallback((id: string, teamId: TeamId | null) => {
@@ -62,7 +82,9 @@ export function useSessionStorage() {
     isHydrated,
     players: session.players,
     addPlayer,
+    addPlayersBulk,
     removePlayer,
+    removePlayersBulk,
     assignTeam,
     assignTeamsBulk,
     resetSession,

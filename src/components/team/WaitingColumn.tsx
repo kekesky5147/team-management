@@ -1,11 +1,21 @@
 "use client";
 
+import { Trash2 } from "lucide-react";
 import { useCallback, useState } from "react";
 
 import { PlayerCard } from "@/components/team/PlayerCard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  appleCard,
+  appleCardContent,
+  appleCardHeader,
+  appleDivider,
+  appleMuted,
+  appleSectionLabel,
+  appleSmallButton,
+} from "@/lib/apple-ui";
 import {
   BULK_ASSIGN_TEAMS,
   WAITING_GRID,
@@ -21,9 +31,10 @@ type WaitingColumnProps = {
   onAssignTeam: (id: string, teamId: TeamId | null) => void;
   onAssignTeamsBulk: (ids: string[], teamId: TeamId | null) => void;
   onRemove: (id: string) => void;
+  onRemoveBulk: (ids: string[]) => void;
 };
 
-const waitingMainGridClassName = "grid w-full grid-flow-col gap-2";
+const waitingMainGridClassName = "grid w-full grid-flow-col gap-2 sm:gap-2.5";
 
 const waitingMainGridStyle: React.CSSProperties = {
   gridTemplateColumns: `repeat(${WAITING_GRID.columns}, minmax(0, 1fr))`,
@@ -31,7 +42,7 @@ const waitingMainGridStyle: React.CSSProperties = {
   maxHeight: WAITING_GRID_MAX_HEIGHT,
 };
 
-const waitingOverflowGridClassName = "grid w-full grid-cols-3 gap-2";
+const waitingOverflowGridClassName = "grid w-full grid-cols-3 gap-2 sm:gap-2.5";
 
 export function WaitingColumn({
   config,
@@ -39,6 +50,7 @@ export function WaitingColumn({
   onAssignTeam,
   onAssignTeamsBulk,
   onRemove,
+  onRemoveBulk,
 }: WaitingColumnProps) {
   const [isMultiSelectMode, setIsMultiSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -75,7 +87,14 @@ export function WaitingColumn({
     if (selectedIds.size === 0) return;
 
     onAssignTeamsBulk(Array.from(selectedIds), teamId);
-    exitMultiSelectMode();
+    setSelectedIds(new Set());
+  };
+
+  const handleBulkDelete = () => {
+    if (selectedIds.size === 0) return;
+
+    onRemoveBulk(Array.from(selectedIds));
+    setSelectedIds(new Set());
   };
 
   const renderPlayers = (list: Player[]) =>
@@ -93,63 +112,98 @@ export function WaitingColumn({
     ));
 
   return (
-    <Card className="h-full gap-0 py-0 shadow-sm">
+    <Card className={cn(appleCard, "h-full")}>
       <CardHeader
         className={cn(
-          "rounded-t-xl border-b px-4 py-4",
+          appleCardHeader,
+          "rounded-t-2xl",
           config.headerClass,
         )}
       >
-        <div className="flex flex-wrap items-center gap-2">
-          <CardTitle className="shrink-0 text-base font-semibold">
-            {config.label}
-          </CardTitle>
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center justify-between gap-2">
+            <CardTitle className="shrink-0 text-base font-semibold tracking-tight text-inherit">
+              {config.label}
+            </CardTitle>
 
-          {isMultiSelectMode && (
-            <div className="flex flex-wrap items-center gap-1.5">
-              {BULK_ASSIGN_TEAMS.map((team) => (
+            <div className="flex shrink-0 items-center gap-2">
+              {isMultiSelectMode && (
                 <Button
-                  key={team.id}
                   type="button"
                   size="sm"
-                  variant="outline"
+                  variant="ghost"
                   disabled={selectedIds.size === 0}
-                  onClick={() => handleBulkAssign(team.id)}
-                  className={cn("h-8 min-h-8 px-2.5 text-xs", team.buttonClass)}
+                  onClick={handleBulkDelete}
+                  aria-label="선택 삭제"
+                  className={cn(
+                    appleSmallButton,
+                    "bg-red-500/10 text-red-300/90 disabled:opacity-40",
+                  )}
                 >
-                  {team.label}
+                  <Trash2 className="size-4" />
                 </Button>
-              ))}
+              )}
+
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                onClick={toggleMultiSelectMode}
+                className={cn(
+                  appleSmallButton,
+                  isMultiSelectMode
+                    ? "bg-white/12 text-neutral-100"
+                    : "bg-white/8 text-neutral-300",
+                )}
+              >
+                {isMultiSelectMode ? "취소" : "다중선택"}
+              </Button>
+
+              <Badge
+                className={cn(
+                  "rounded-full border-0 px-3 py-1 text-sm font-medium shadow-none",
+                  config.badgeClass,
+                )}
+              >
+                {players.length}명
+              </Badge>
+            </div>
+          </div>
+
+          {isMultiSelectMode && (
+            <div className="flex flex-col gap-2">
+              <div className="flex flex-wrap gap-2">
+                {BULK_ASSIGN_TEAMS.map((team) => (
+                  <Button
+                    key={team.id}
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    disabled={selectedIds.size === 0}
+                    onClick={() => handleBulkAssign(team.id)}
+                    className={cn(appleSmallButton, team.buttonClass)}
+                  >
+                    {team.label}
+                  </Button>
+                ))}
+              </div>
+
+              {selectedIds.size > 0 && (
+                <p className={`${appleMuted} text-xs`}>
+                  {selectedIds.size}명 선택됨 · 팀 배정 또는 삭제
+                </p>
+              )}
             </div>
           )}
-
-          <div className="ml-auto flex shrink-0 items-center gap-2">
-            <Button
-              type="button"
-              size="sm"
-              variant={isMultiSelectMode ? "secondary" : "outline"}
-              onClick={toggleMultiSelectMode}
-              className="h-8 min-h-8 px-2.5 text-xs"
-            >
-              {isMultiSelectMode ? "취소" : "다중선택"}
-            </Button>
-
-            <Badge className={cn("px-2.5 py-1 text-sm", config.badgeClass)}>
-              {players.length}명
-            </Badge>
-          </div>
         </div>
-
-        {isMultiSelectMode && selectedIds.size > 0 && (
-          <p className="mt-2 text-xs text-muted-foreground">
-            {selectedIds.size}명 선택됨 · 팀 버튼을 눌러 일괄 배정
-          </p>
-        )}
       </CardHeader>
 
-      <CardContent className="px-4 py-4">
+      <CardContent
+        className={cn(appleCardContent, isMultiSelectMode && "cursor-default")}
+        onClick={isMultiSelectMode ? exitMultiSelectMode : undefined}
+      >
         {players.length === 0 ? (
-          <p className="py-8 text-center text-sm text-muted-foreground">
+          <p className={`${appleMuted} py-12 text-center`}>
             아직 배정된 선수가 없습니다
           </p>
         ) : (
@@ -162,12 +216,11 @@ export function WaitingColumn({
             </div>
 
             {overflowPlayers.length > 0 && (
-              <div className="mt-4 border-t border-border pt-4">
-                <div className="mb-3 flex items-center justify-between gap-2">
-                  <p className="text-sm font-semibold text-foreground">
-                    추가 인원
-                  </p>
-                  <Badge variant="secondary" className="text-sm">
+              <div>
+                <div className={appleDivider} />
+                <div className="mb-4 flex items-center justify-between gap-3">
+                  <p className={appleSectionLabel}>추가 인원</p>
+                  <Badge className="rounded-full border-0 bg-white/10 px-3 py-1 text-sm font-medium text-neutral-300 shadow-none">
                     {overflowPlayers.length}명
                   </Badge>
                 </div>

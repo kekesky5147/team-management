@@ -10,6 +10,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
+  appleDropdownContent,
+  applePlayerSurface,
+  appleSelectableCard,
+  appleSelectableCardSelected,
+  appleSelectableCardUnselected,
+  appleTouchIconButton,
+} from "@/lib/apple-ui";
+import {
   getCurrentTeamOptionId,
   TEAM_ASSIGN_OPTIONS,
 } from "@/lib/teams";
@@ -42,106 +50,129 @@ export function PlayerCard({
     onAssignTeam(player.id, teamId);
   };
 
-  const handleCardClick = () => {
-    if (selectionMode) {
-      onToggleSelect?.(player.id);
-    }
+  const handleToggleSelect = () => {
+    onToggleSelect?.(player.id);
   };
+
+  const handleSelectionKeyDown = (
+    event: React.KeyboardEvent<HTMLDivElement>,
+  ) => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    event.preventDefault();
+    handleToggleSelect();
+  };
+
+  if (selectionMode) {
+    return (
+      <div
+        role="button"
+        tabIndex={0}
+        aria-pressed={selected}
+        aria-label={`${player.name} ${selected ? "선택됨" : "선택 안 됨"}`}
+        onClick={(event) => {
+          event.stopPropagation();
+          handleToggleSelect();
+        }}
+        onKeyDown={handleSelectionKeyDown}
+        className={cn(
+          appleSelectableCard,
+          "grid place-items-center",
+          compact
+            ? "h-11 min-h-11 max-h-11 w-full min-w-0 px-1.5"
+            : "min-h-11 w-full px-3 py-2",
+          selected
+            ? appleSelectableCardSelected
+            : appleSelectableCardUnselected,
+        )}
+      >
+        <span
+          className={cn(
+            "w-full min-w-0 truncate text-center font-medium text-neutral-200",
+            compact ? "text-xs sm:text-sm" : "text-base",
+            selected && "text-blue-100",
+          )}
+        >
+          {player.name}
+        </span>
+      </div>
+    );
+  }
 
   return (
     <div
       className={cn(
-        "flex items-center gap-1 rounded-lg border bg-background shadow-sm",
+        applePlayerSurface,
+        "relative grid w-full place-items-center",
         compact
-          ? "h-11 min-h-11 max-h-11 w-full min-w-0 px-1 py-1"
-          : "gap-2 px-2 py-1.5",
-        selectionMode && selected && "border-primary ring-1 ring-primary/30",
-        selectionMode && "cursor-pointer",
+          ? "h-10 min-h-10 max-h-10 min-w-0 px-8"
+          : "min-h-11 px-11 py-1 sm:py-2",
       )}
-      onClick={selectionMode ? handleCardClick : undefined}
     >
-      {selectionMode && (
-        <input
-          type="checkbox"
-          checked={selected}
-          onChange={() => onToggleSelect?.(player.id)}
-          onClick={(event) => event.stopPropagation()}
-          aria-label={`${player.name} 선택`}
-          className="ml-0.5 size-4 shrink-0 accent-primary"
-        />
-      )}
-
-      <div className="min-w-0 flex-1">
-        {selectionMode ? (
-          <span
-            className={cn(
-              "flex h-full min-h-9 items-center truncate font-medium",
-              compact ? "px-1 text-xs sm:px-2 sm:text-sm" : "px-3 text-base",
-            )}
-          >
-            {player.name}
-          </span>
-        ) : (
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              render={
-                <Button
-                  variant="ghost"
-                  className={cn(
-                    "min-h-10 w-full touch-manipulation font-medium",
-                    compact
-                      ? "h-full min-h-0 justify-center px-1 text-xs active:bg-muted max-md:rounded-md md:justify-between sm:px-2 sm:text-sm"
-                      : "justify-center px-3 text-base active:bg-muted max-md:rounded-md md:justify-between",
-                  )}
-                />
-              }
-            >
-              <span className="truncate">{player.name}</span>
-              <ChevronDown
+      <div className="w-full min-w-0">
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            render={
+              <Button
+                variant="ghost"
                 className={cn(
-                  "hidden shrink-0 text-muted-foreground md:block",
-                  compact ? "size-3.5" : "size-4",
+                  "relative w-full min-w-0 touch-manipulation justify-center font-medium text-neutral-200 transition-all duration-200 active:scale-95 hover:bg-white/5",
+                  compact
+                    ? "h-10 min-h-10 rounded-lg px-0 text-xs"
+                    : "min-h-11 rounded-lg px-0 text-base",
                 )}
               />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-40">
-              {TEAM_ASSIGN_OPTIONS.map((option) => {
-                const isCurrent = option.id === currentOptionId;
+            }
+          >
+            <span
+              className={cn(
+                "block w-full truncate text-center font-medium text-neutral-200",
+                compact ? "text-xs" : "text-base",
+              )}
+            >
+              {player.name}
+            </span>
+            {!compact && (
+              <ChevronDown className="absolute top-1/2 right-0 size-4 -translate-y-1/2 shrink-0 text-neutral-500" />
+            )}
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            align="center"
+            className={`${appleDropdownContent} w-40`}
+          >
+            {TEAM_ASSIGN_OPTIONS.map((option) => {
+              const isCurrent = option.id === currentOptionId;
 
-                return (
-                  <DropdownMenuItem
-                    key={option.id}
-                    disabled={isCurrent}
-                    onClick={() => handleAssign(option.id)}
-                    className="min-h-10 text-base"
-                  >
-                    <span className="flex-1">{option.label}</span>
-                    {isCurrent && (
-                      <Check className="size-4 text-muted-foreground" />
-                    )}
-                  </DropdownMenuItem>
-                );
-              })}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
+              return (
+                <DropdownMenuItem
+                  key={option.id}
+                  disabled={isCurrent}
+                  onClick={() => handleAssign(option.id)}
+                  className="min-h-11 justify-center rounded-lg text-center text-base text-neutral-200 focus:bg-white/10"
+                >
+                  <span>{option.label}</span>
+                  {isCurrent && (
+                    <Check className="size-4 text-neutral-400" />
+                  )}
+                </DropdownMenuItem>
+              );
+            })}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
-      {!selectionMode && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon-sm"
-          className={cn(
-            "shrink-0 text-muted-foreground hover:text-destructive",
-            compact ? "h-8 min-h-8 min-w-8 w-8" : "min-h-10 min-w-10",
-          )}
-          aria-label={`${player.name} 삭제`}
-          onClick={() => onRemove(player.id)}
-        >
-          <X className="size-4" />
-        </Button>
-      )}
+      <Button
+        type="button"
+        variant="ghost"
+        className={cn(
+          appleTouchIconButton,
+          "absolute top-1/2 right-0 -translate-y-1/2",
+          compact && "h-8 min-h-8 w-8 min-w-8",
+        )}
+        aria-label={`${player.name} 삭제`}
+        onClick={() => onRemove(player.id)}
+      >
+        <X className={compact ? "size-3.5" : "size-4"} />
+      </Button>
     </div>
   );
 }
